@@ -13,9 +13,30 @@ export const metadata: Metadata = {
   },
 };
 
+// Inline script runs BEFORE React hydrates → no light/dark flash on load.
+// Reads localStorage, falls back to prefers-color-scheme, defaults to light.
+const themeInit = `
+(function(){
+  try {
+    var saved = localStorage.getItem('snit-theme');
+    if (saved === 'dark') {
+      document.documentElement.classList.add('dark');
+      return;
+    }
+    if (saved === 'light') return;
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.classList.add('dark');
+    }
+  } catch(e){}
+})();
+`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInit }} />
+      </head>
       <body>
         <Providers>{children}</Providers>
       </body>

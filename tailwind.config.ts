@@ -6,19 +6,20 @@ export default {
     './components/**/*.{ts,tsx}',
     './lib/**/*.{ts,tsx}',
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        // snit palette — sharp, monochrome with one warm accent
+        // CSS variables drive theme switching. Light mode is the default.
         snit: {
-          bg: '#0A0A0A',          // near-black, same energy as Chartist
-          surface: '#141414',
-          border: '#262626',
-          fg: '#F5F5F5',
-          muted: '#737373',
-          accent: '#FF5C29',       // sharp orange — quick, snap-like
-          live: '#22C55E',
-          ended: '#737373',
+          bg: 'rgb(var(--snit-bg) / <alpha-value>)',
+          surface: 'rgb(var(--snit-surface) / <alpha-value>)',
+          border: 'rgb(var(--snit-border) / <alpha-value>)',
+          fg: 'rgb(var(--snit-fg) / <alpha-value>)',
+          muted: 'rgb(var(--snit-muted) / <alpha-value>)',
+          accent: 'rgb(var(--snit-accent) / <alpha-value>)',
+          live: 'rgb(var(--snit-live) / <alpha-value>)',
+          ended: 'rgb(var(--snit-ended) / <alpha-value>)',
         },
       },
       fontFamily: {
