@@ -212,7 +212,7 @@ export default function CreateDropPage() {
             type="file"
             accept="image/*,video/mp4"
             onChange={onFileChange}
-            className="block w-full text-sm text-snit-muted file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-snit-accent file:text-black file:font-semibold"
+            className="block w-full text-sm text-snit-muted file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-snit-accent file:text-white file:font-semibold"
           />
           {form.filePreviewUrl && (
             // eslint-disable-next-line @next/next/no-img-element
@@ -248,7 +248,7 @@ export default function CreateDropPage() {
             placeholder="0.00037"
           />
           <p className="text-xs text-snit-muted mt-1">
-            0 for free, otherwise minimum {MIN_PAID_PRICE_ETH} ETH.
+            0.00037 or higher. else 0.
           </p>
         </Field>
 
@@ -356,7 +356,7 @@ export default function CreateDropPage() {
         <button
           type="submit"
           disabled={isSubmitting || !isConnected}
-          className="w-full py-3 bg-snit-accent text-black font-semibold rounded-lg disabled:opacity-50 hover:opacity-90 transition"
+          className="w-full py-3 font-semibold rounded-lg transition bg-snit-accent text-white hover:opacity-90 disabled:bg-snit-surface disabled:text-snit-muted disabled:cursor-not-allowed disabled:hover:opacity-100"
         >
           {step === 'idle' && 'deploy drop'}
           {step === 'uploading' && 'uploading art...'}
