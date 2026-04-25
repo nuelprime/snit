@@ -29,10 +29,6 @@ Responds with `application/vnd.farcaster.snap+json`. Single Mint button uses
 `open_mini_app` action to bounce into `/mint/[id]` (snaps don't support arbitrary
 contract calls — only token sends/swaps natively).
 
-### Mint flow
-The mint page is a Farcaster miniapp (has `fc:miniapp` meta tag). Auto-connects
-to FC wallet, calls Zora's `mintWithRewards` with `mintReferral = PLATFORM_ADDRESS`.
-
 ### Anti-staleness in feed
 Snap GET response is cached 30s. Image OG is cached 30s + revalidates on mints.
 Pre-tap snap shows rounded time labels ("3d left") and round mint counts to stay

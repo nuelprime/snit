@@ -248,7 +248,7 @@ export default function CreateDropPage() {
             placeholder="0.00037"
           />
           <p className="text-xs text-snit-muted mt-1">
-            0.00037 or higher. else 0.
+            0/0.00037/↑
           </p>
         </Field>
 
