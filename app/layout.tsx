@@ -14,17 +14,11 @@ export const metadata: Metadata = {
 };
 
 // Inline script runs BEFORE React hydrates → no light/dark flash on load.
-// Reads localStorage, falls back to prefers-color-scheme, defaults to light.
+// Only adds .dark if user explicitly chose it before. Default = light.
 const themeInit = `
 (function(){
   try {
-    var saved = localStorage.getItem('snit-theme');
-    if (saved === 'dark') {
-      document.documentElement.classList.add('dark');
-      return;
-    }
-    if (saved === 'light') return;
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    if (localStorage.getItem('snit-theme') === 'dark') {
       document.documentElement.classList.add('dark');
     }
   } catch(e){}

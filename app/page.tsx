@@ -9,18 +9,19 @@ export default function HomePage() {
         <ThemeToggle />
       </div>
 
-      {/* Center content vertically, constrained to button width */}
+      {/* Center content vertically, constrained to button width.
+          Everything inside this column is left-aligned. */}
       <div className="flex-1 flex items-center justify-center">
         <div className="max-w-md w-full space-y-8">
-          {/* Title block — kept center-aligned */}
-          <div className="text-center">
+          {/* Title block — now left-aligned to match button column */}
+          <div>
             <h1 className="text-6xl font-bold tracking-tight">snit</h1>
             <p className="mt-3 text-snit-muted text-sm tracking-widest">
               mint the moment
             </p>
           </div>
 
-          {/* Tagline — left edge of button column */}
+          {/* Tagline */}
           <p className="text-snit-fg/80 leading-relaxed">
             snap it, snit it.
           </p>

@@ -17,19 +17,17 @@ const STORAGE_KEY = 'snit-theme';
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>('light');
 
-  // Load saved preference on mount; fall back to system; final fallback = light
+  // Load saved preference on mount. NO system preference fallback.
+  // First-time visitors always get light mode.
   useEffect(() => {
     const saved = (typeof window !== 'undefined'
       ? (localStorage.getItem(STORAGE_KEY) as Theme | null)
       : null);
 
-    if (saved === 'light' || saved === 'dark') {
-      setThemeState(saved);
-      return;
+    if (saved === 'dark') {
+      setThemeState('dark');
     }
-    // No explicit choice — respect system preference, default light
-    const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
-    setThemeState(prefersDark ? 'dark' : 'light');
+    // else: stay on the default 'light'
   }, []);
 
   // Apply theme to <html>
