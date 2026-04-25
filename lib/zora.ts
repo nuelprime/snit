@@ -66,7 +66,7 @@ export async function deployDrop(params: DeployParams): Promise<DeployResult> {
       },
     },
     account: params.creatorAddress,
-    publicClient: params.publicClient,
+    publicClient: params.publicClient as any,
   });
 
   // Send the deploy tx
@@ -112,7 +112,7 @@ export async function buildMintTx(params: MintParams) {
     quantityToMint: Number(params.quantity),
     mintReferral: PLATFORM_ADDRESS, // 🎯 we earn referral rewards on every mint
     minterAccount: params.minterAddress,
-    publicClient: params.publicClient,
+    publicClient: params.publicClient as any,
   });
   return parameters;
 }
