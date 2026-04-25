@@ -81,3 +81,10 @@ export interface PublicDrop {
 export const PROTOCOL_FEE_WEI = '111000000000000'; // 0.000111 ETH
 export const SPLIT_ARTIST_BPS = 9000;  // 90%
 export const SPLIT_PLATFORM_BPS = 1000; // 10%
+
+// Pricing floor:
+// Drops must be either FREE (0) or at least MIN_PAID_PRICE_WEI.
+// Anything in between (e.g. 0.0001) is rejected at form + backend.
+// 0.00037 ETH = 370_000_000_000_000 wei
+export const MIN_PAID_PRICE_WEI = '370000000000000';
+export const MIN_PAID_PRICE_ETH = '0.00037';

@@ -5,6 +5,7 @@ import { useAccount, useConnect, usePublicClient, useWalletClient } from 'wagmi'
 import { parseEther, formatEther } from 'viem';
 import { useRouter } from 'next/navigation';
 import type { Duration, EndCondition } from '@/lib/types';
+import { MIN_PAID_PRICE_ETH } from '@/lib/types';
 
 interface DropFormState {
   title: string;
@@ -78,6 +79,21 @@ export default function CreateDropPage() {
     }
     if (!form.title.trim()) {
       setError('Title required');
+      return;
+    }
+
+    // Price floor: must be 0 (free) or >= MIN_PAID_PRICE_ETH.
+    // We compare in wei to avoid float precision issues.
+    let priceWei: bigint;
+    try {
+      priceWei = parseEther(form.mintPriceEth || '0');
+    } catch {
+      setError('Invalid mint price');
+      return;
+    }
+    const minWei = parseEther(MIN_PAID_PRICE_ETH);
+    if (priceWei !== 0n && priceWei < minWei) {
+      setError(`Mint price must be 0 (free) or at least ${MIN_PAID_PRICE_ETH} ETH`);
       return;
     }
 
@@ -190,8 +206,8 @@ export default function CreateDropPage() {
       )}
 
       <form onSubmit={onSubmit} className="space-y-6">
-        {/* Art upload */}
-        <Field label="art">
+        {/* Piece upload */}
+        <Field label="Piece">
           <input
             type="file"
             accept="image/*,video/mp4"
@@ -204,7 +220,7 @@ export default function CreateDropPage() {
           )}
         </Field>
 
-        <Field label="title">
+        <Field label="Title">
           <Input
             value={form.title}
             onChange={(v) => update('title', v)}
@@ -213,7 +229,7 @@ export default function CreateDropPage() {
           />
         </Field>
 
-        <Field label="description (optional)">
+        <Field label="Description (optional)">
           <Textarea
             value={form.description}
             onChange={(v) => update('description', v)}
@@ -222,21 +238,21 @@ export default function CreateDropPage() {
           />
         </Field>
 
-        <Field label="mint price (ETH)">
+        <Field label="Mint price (ETH)">
           <Input
             type="number"
             step="0.000001"
             min="0"
             value={form.mintPriceEth}
             onChange={(v) => update('mintPriceEth', v)}
-            placeholder="0.00037 (suggested) or 0 for free"
+            placeholder="0.00037"
           />
           <p className="text-xs text-snit-muted mt-1">
-            Suggested: 0.00037 ETH. Set to 0 for a free mint. Collector pays mint price + 0.000111 ETH Zora fee. You receive ~90%.
+            0 for free, otherwise minimum {MIN_PAID_PRICE_ETH} ETH.
           </p>
         </Field>
 
-        <Field label="when does it end?">
+        <Field label="When does it end?">
           <div className="flex gap-2 flex-wrap">
             {(['time_only', 'supply_only', 'time_or_supply'] as EndCondition[]).map((opt) => (
               <button
@@ -256,7 +272,7 @@ export default function CreateDropPage() {
         </Field>
 
         {form.endCondition !== 'supply_only' && (
-          <Field label="duration">
+          <Field label="Duration">
             <div className="flex gap-2 flex-wrap">
               {(['24h', '3d', '7d', 'custom'] as Duration[]).map((d) => (
                 <button
@@ -286,7 +302,7 @@ export default function CreateDropPage() {
         )}
 
         {form.endCondition !== 'time_only' && (
-          <Field label="max supply">
+          <Field label="Max supply">
             <Input
               type="number"
               min={1}
@@ -297,7 +313,7 @@ export default function CreateDropPage() {
           </Field>
         )}
 
-        <Field label="when does it start?">
+        <Field label="When does it start?">
           <div className="flex gap-2 mb-2">
             <button
               type="button"
@@ -356,7 +372,7 @@ export default function CreateDropPage() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="block text-sm uppercase tracking-wider text-snit-muted mb-2">
+      <span className="block text-sm tracking-wide text-snit-muted mb-2">
         {label}
       </span>
       {children}

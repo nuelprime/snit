@@ -5,6 +5,7 @@ import { saveDrop } from '@/lib/store';
 import { fetchProfile } from '@/lib/neynar';
 import { getSessionFromRequest } from '@/lib/auth';
 import type { Drop } from '@/lib/types';
+import { MIN_PAID_PRICE_WEI } from '@/lib/types';
 
 export const runtime = 'nodejs';
 
@@ -36,6 +37,18 @@ export async function POST(req: NextRequest) {
       );
     }
     const data = parsed.data;
+
+    // Price floor enforcement (mirror of frontend check):
+    // Allowed values: 0 (free) OR >= MIN_PAID_PRICE_WEI.
+    // This is the security boundary — frontend can be bypassed.
+    const priceWei = BigInt(data.mintPriceWei);
+    const minWei = BigInt(MIN_PAID_PRICE_WEI);
+    if (priceWei !== 0n && priceWei < minWei) {
+      return NextResponse.json(
+        { error: `Mint price must be 0 (free) or at least ${MIN_PAID_PRICE_WEI} wei` },
+        { status: 400 },
+      );
+    }
 
     // Lookup FC profile (fallback: minimal record if no session)
     const fid = session?.fid ?? 0;
