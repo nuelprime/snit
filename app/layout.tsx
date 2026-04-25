@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Providers } from './providers';
+import Header from '@/components/Header';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_URL ?? 'https://snit.lol'),
@@ -13,8 +14,6 @@ export const metadata: Metadata = {
   },
 };
 
-// Inline script runs BEFORE React hydrates → no light/dark flash on load.
-// Only adds .dark if user explicitly chose it before. Default = light.
 const themeInit = `
 (function(){
   try {
@@ -32,7 +31,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />
       </head>
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          <Header />
+          {children}
+        </Providers>
       </body>
     </html>
   );

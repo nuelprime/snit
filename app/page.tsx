@@ -1,19 +1,13 @@
 import Link from 'next/link';
-import ThemeToggle from '@/components/ThemeToggle';
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen flex flex-col px-6 py-6 relative">
-      {/* Theme toggle in top-right corner */}
-      <div className="absolute top-4 right-4">
-        <ThemeToggle />
-      </div>
-
+    <main className="min-h-[calc(100vh-3rem)] flex flex-col px-6 py-6">
       {/* Center content vertically, constrained to button width.
           Everything inside this column is left-aligned. */}
       <div className="flex-1 flex items-center justify-center">
         <div className="max-w-md w-full space-y-8">
-          {/* Title block — now left-aligned to match button column */}
+          {/* Title block — left-aligned to match button column */}
           <div>
             <h1 className="text-6xl font-bold tracking-tight">snit</h1>
             <p className="mt-3 text-snit-muted text-sm tracking-widest">
@@ -44,7 +38,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Footer — sits at bottom of page, content aligned to same center column */}
+      {/* Footer */}
       <footer className="flex justify-center">
         <div className="max-w-md w-full">
           <div className="text-xs text-snit-muted">powered by zora</div>
