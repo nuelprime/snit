@@ -1,4 +1,4 @@
-import { SplitV2Client, SplitV2Type } from '@0xsplits/splits-sdk';
+import { SplitV2Client } from '@0xsplits/splits-sdk';
 import type { Address, PublicClient, WalletClient } from 'viem';
 import { base } from 'viem/chains';
 import { SPLIT_ARTIST_BPS, SPLIT_PLATFORM_BPS } from './types';
@@ -13,8 +13,9 @@ const PLATFORM_ADDRESS = process.env.NEXT_PUBLIC_PLATFORM_ADDRESS as Address;
 // Push split = funds auto-forward on receipt. Higher gas per mint but
 // recipients don't need to claim manually.
 //
-// SDK V2 createSplit returns { splitAddress, event } directly — no need
-// to extract from logs ourselves.
+// SDK V2 createSplit returns { splitAddress, event } directly.
+// SplitV2Type enum is not re-exported from the package root so we use
+// the string literal 'push' which the SDK accepts as the enum value.
 // ─────────────────────────────────────────────
 
 export interface CreateSplitsParams {
@@ -50,7 +51,7 @@ export async function createSplitsContract(
     ],
     distributorFeePercent: 0, // no keeper fee
     totalAllocationPercent: 100,
-    splitType: SplitV2Type.Push,
+    splitType: 'push' as any, // SplitV2Type.Push enum value
     ownerAddress: params.artistAddress, // artist owns the split contract
     creatorAddress: params.fromAddress, // who deployed it
     chainId: base.id,
