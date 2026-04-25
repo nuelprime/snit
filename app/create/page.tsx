@@ -25,7 +25,7 @@ const initialState: DropFormState = {
   description: '',
   file: null,
   filePreviewUrl: '',
-  mintPriceEth: '0',
+  mintPriceEth: '0.00037',
   startMode: 'now',
   startTime: '',
   duration: '3d',
@@ -229,11 +229,10 @@ export default function CreateDropPage() {
             min="0"
             value={form.mintPriceEth}
             onChange={(v) => update('mintPriceEth', v)}
-            placeholder="0 for free, or e.g. 0.000259"
+            placeholder="0.00037 (suggested) or 0 for free"
           />
           <p className="text-xs text-snit-muted mt-1">
-            Collector pays {form.mintPriceEth || '0'} ETH + 0.000111 ETH protocol fee.
-            You receive ~90% of mint price.
+            Suggested: 0.00037 ETH. Set to 0 for a free mint. Collector pays mint price + 0.000111 ETH Zora fee. You receive ~90%.
           </p>
         </Field>
 
