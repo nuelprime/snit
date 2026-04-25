@@ -3,21 +3,25 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import type { Drop } from '@/lib/types';
+import { authedFetch } from '@/lib/client-auth';
 
 export default function MyDropsPage() {
   const [drops, setDrops] = useState<Drop[]>([]);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState(false);
 
   useEffect(() => {
     (async () => {
       try {
-        const { sdk } = await import('@farcaster/miniapp-sdk');
-        const token = await sdk.quickAuth.getToken();
-        const res = await fetch('/api/drops/mine', {
-          headers: { Authorization: `Bearer ${token.token}` },
-        });
+        const res = await authedFetch('/api/drops/mine');
+        if (res.status === 401) {
+          // Not signed in (probably not in a Farcaster client).
+          setAuthError(true);
+          return;
+        }
+        if (!res.ok) throw new Error('Failed to load drops');
         const { drops } = await res.json();
-        setDrops(drops);
+        setDrops(drops ?? []);
       } catch (err) {
         console.error(err);
       } finally {
@@ -32,7 +36,7 @@ export default function MyDropsPage() {
         <h1 className="text-3xl font-bold">my drops</h1>
         <Link
           href="/create"
-          className="px-3 py-1.5 bg-snit-accent text-black text-sm font-semibold rounded"
+          className="px-3 py-1.5 bg-snit-accent text-white text-sm font-semibold rounded"
         >
           + new
         </Link>
@@ -40,6 +44,10 @@ export default function MyDropsPage() {
 
       {loading ? (
         <div className="text-snit-muted">loading…</div>
+      ) : authError ? (
+        <div className="text-center py-12 text-snit-muted text-sm">
+          open snit inside farcaster to see your drops.
+        </div>
       ) : drops.length === 0 ? (
         <div className="text-center py-12 text-snit-muted">
           no drops yet. <Link href="/create" className="text-snit-accent">create one</Link>

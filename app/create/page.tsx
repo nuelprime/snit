@@ -6,6 +6,7 @@ import { parseEther, formatEther } from 'viem';
 import { useRouter } from 'next/navigation';
 import type { Duration, EndCondition } from '@/lib/types';
 import { MIN_PAID_PRICE_ETH } from '@/lib/types';
+import { authedFetch } from '@/lib/client-auth';
 
 interface DropFormState {
   title: string;
@@ -106,7 +107,7 @@ export default function CreateDropPage() {
       fd.append('title', form.title);
       fd.append('description', form.description);
 
-      const uploadRes = await fetch('/api/drops/upload', { method: 'POST', body: fd });
+      const uploadRes = await authedFetch('/api/drops/upload', { method: 'POST', body: fd });
       if (!uploadRes.ok) throw new Error('Upload failed');
       const { mediaUri, metadataUri } = (await uploadRes.json()) as {
         mediaUri: string;
@@ -134,7 +135,7 @@ export default function CreateDropPage() {
         : start + durationSecs;
 
       // 3. Prep the drop record on backend (returns dropId + suggested splits config)
-      const prepRes = await fetch('/api/drops/create', {
+      const prepRes = await authedFetch('/api/drops/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -248,7 +249,7 @@ export default function CreateDropPage() {
             placeholder="0.00037"
           />
           <p className="text-xs text-snit-muted mt-1">
-            0/0.00037/↑
+            0.00037 or higher. else 0.
           </p>
         </Field>
 
