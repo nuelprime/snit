@@ -71,14 +71,13 @@ export default function MintClient({ drop }: Props) {
         tokenId: BigInt(drop.tokenId),
         quantity: 1n,
         minterAddress: address,
-        pricePerTokenWei: BigInt(drop.mintPrice),
         publicClient,
       });
 
-      const hash = await walletClient.sendTransaction({
+      const hash = await walletClient.writeContract({
         ...params,
         account: address,
-      });
+      } as any);
       setTxHash(hash);
     } catch (err) {
       console.error(err);

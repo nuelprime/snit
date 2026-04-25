@@ -1,64 +1,124 @@
-import { SplitV2Client, SplitV2Type } from '@0xsplits/splits-sdk';
+import { create1155, mint } from '@zoralabs/protocol-sdk';
 import type { Address, PublicClient, WalletClient } from 'viem';
 import { base } from 'viem/chains';
-import { SPLIT_ARTIST_BPS, SPLIT_PLATFORM_BPS } from './types';
+import { PROTOCOL_FEE_WEI } from './types';
 
 const PLATFORM_ADDRESS = process.env.NEXT_PUBLIC_PLATFORM_ADDRESS as Address;
 
 // ─────────────────────────────────────────────
-// 0xSplits V2 (Push type)
-// Creates a tiny payable contract that auto-distributes incoming ETH
-// to the artist (90%) and platform (10%) per the configured percentages.
+// Zora Protocol SDK — current API
+// 
+// Uses direct exports `create1155` and `mint` from @zoralabs/protocol-sdk.
+// The `createCreatorClient`/`createCollectorClient` wrappers are deprecated.
 //
-// Push split = funds auto-forward on receipt. Higher gas per mint but
-// recipients don't need to claim manually.
-//
-// SDK V2 createSplit returns { splitAddress, event } directly — no need
-// to extract from logs ourselves.
+// Both functions return { parameters, ... } where `parameters` is a
+// SimulateContract-shape object that we pass to walletClient.writeContract
+// (or sendTransaction in our case since wagmi's connector is configured
+// for FC miniapp wallet sheets).
 // ─────────────────────────────────────────────
 
-export interface CreateSplitsParams {
-  artistAddress: Address;
+export interface DeployParams {
+  creatorAddress: Address;
+  splitsAddress: Address;
+  contractName: string;
+  contractURI: string;          // collection-level metadata URI
+  tokenURI: string;             // token-level metadata URI
+  pricePerTokenWei: bigint;     // 0n for free mint
+  saleStart: bigint;            // unix seconds
+  saleEnd: bigint;              // unix seconds (effectively forever for supply-only)
+  maxSupply: bigint;            // 0n means unlimited
   publicClient: PublicClient;
   walletClient: WalletClient;
-  fromAddress: Address;
 }
 
-export interface CreateSplitsResult {
-  splitsAddress: Address;
-  txHash?: `0x${string}`;
+export interface DeployResult {
+  contractAddress: Address;
+  tokenId: bigint;
+  txHash: `0x${string}`;
 }
 
-export async function createSplitsContract(
-  params: CreateSplitsParams,
-): Promise<CreateSplitsResult> {
-  const client = new SplitV2Client({
-    chainId: base.id,
-    publicClient: params.publicClient as any,
-    walletClient: params.walletClient as any,
+export async function deployDrop(params: DeployParams): Promise<DeployResult> {
+  // create1155 prepares contract creation + first token in one tx.
+  // We use the FixedPriceSaleStrategy by setting `pricePerToken` (when > 0)
+  // OR for free mints, we still want fixed-price strategy without the 
+  // Timed Sale auto-secondary (so we set `mintStart` / `mintEnd`).
+  //
+  // For an open edition with no supply cap, max uint64 is the standard.
+  const effectiveMaxSupply =
+    params.maxSupply === 0n ? 18446744073709551615n /* uint64 max */ : params.maxSupply;
+
+  const { parameters, contractAddress } = await create1155({
+    contract: {
+      name: params.contractName,
+      uri: params.contractURI,
+    },
+    token: {
+      tokenMetadataURI: params.tokenURI,
+      payoutRecipient: params.splitsAddress,
+      createReferral: PLATFORM_ADDRESS,
+      maxSupply: effectiveMaxSupply,
+      mintToCreatorCount: 1, // mint #1 to artist for proof-of-creation
+      salesConfig: {
+        type: 'fixedPrice',
+        pricePerToken: params.pricePerTokenWei,
+        saleStart: params.saleStart,
+        saleEnd: params.saleEnd,
+      },
+    },
+    account: params.creatorAddress,
+    publicClient: params.publicClient,
   });
 
-  // Splits SDK uses percentage as a number (0-100, up to 4 decimal places).
-  // Our BPS constants are in basis points (10_000 = 100%). Convert.
-  const artistPercent = SPLIT_ARTIST_BPS / 100;   // 9000 BPS → 90.0%
-  const platformPercent = SPLIT_PLATFORM_BPS / 100; // 1000 BPS → 10.0%
+  // Send the deploy tx
+  const txHash = await params.walletClient.writeContract({
+    ...parameters,
+    account: params.creatorAddress,
+    chain: base,
+  } as any);
 
-  const response = await client.createSplit({
-    recipients: [
-      { address: params.artistAddress, percentAllocation: artistPercent },
-      { address: PLATFORM_ADDRESS, percentAllocation: platformPercent },
-    ],
-    distributorFeePercent: 0, // no keeper fee
-    totalAllocationPercent: 100,
-    splitType: SplitV2Type.Push,
-    ownerAddress: params.artistAddress, // artist owns the split contract
-    creatorAddress: params.fromAddress, // who deployed it
-    chainId: base.id,
-    // salt: omit → SDK uses factory.createSplit which generates onchain
+  // Wait for confirmation
+  const receipt = await params.publicClient.waitForTransactionReceipt({
+    hash: txHash,
   });
+
+  if (receipt.status !== 'success') {
+    throw new Error('Deploy transaction reverted');
+  }
 
   return {
-    splitsAddress: (response as any).splitAddress as Address,
-    txHash: (response as any).txHash,
+    contractAddress: contractAddress as Address,
+    tokenId: 1n, // first token in a fresh contract
+    txHash,
   };
+}
+
+// ─────────────────────────────────────────────
+// Mint — collector-side
+// ─────────────────────────────────────────────
+
+export interface MintParams {
+  contractAddress: Address;
+  tokenId: bigint;
+  quantity: bigint;
+  minterAddress: Address;
+  publicClient: PublicClient;
+}
+
+export async function buildMintTx(params: MintParams) {
+  const { parameters } = await mint({
+    tokenContract: params.contractAddress,
+    mintType: '1155',
+    tokenId: params.tokenId,
+    quantityToMint: Number(params.quantity),
+    mintReferral: PLATFORM_ADDRESS, // 🎯 we earn referral rewards on every mint
+    minterAccount: params.minterAddress,
+    publicClient: params.publicClient,
+  });
+  return parameters;
+}
+
+// Total cost (price + protocol fee) in wei
+export function totalMintCost(pricePerTokenWei: bigint, quantity: bigint = 1n): bigint {
+  const protocolFee = BigInt(PROTOCOL_FEE_WEI);
+  return (pricePerTokenWei + protocolFee) * quantity;
 }
