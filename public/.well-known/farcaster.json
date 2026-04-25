@@ -1,0 +1,21 @@
+{
+  "accountAssociation": {
+    "header": "REPLACE_AFTER_DOMAIN_VERIFICATION",
+    "payload": "REPLACE_AFTER_DOMAIN_VERIFICATION",
+    "signature": "REPLACE_AFTER_DOMAIN_VERIFICATION"
+  },
+  "frame": {
+    "version": "1",
+    "name": "snit",
+    "iconUrl": "https://snit.lol/icon.png",
+    "homeUrl": "https://snit.lol",
+    "imageUrl": "https://snit.lol/og.png",
+    "buttonTitle": "open snit",
+    "splashImageUrl": "https://snit.lol/splash.png",
+    "splashBackgroundColor": "#0a0a0a",
+    "subtitle": "mint moments on farcaster",
+    "description": "Time-gated open editions, mintable in-feed.",
+    "primaryCategory": "art-creativity",
+    "tags": ["mint", "nft", "art", "base", "zora"]
+  }
+}
