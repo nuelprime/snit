@@ -85,10 +85,10 @@ async function handleSnap({ id }: { id: string }) {
       : `${timeLabel} left`;
 
   // ── Build snap UI ──
-  // Action: submit with params.target — the universal pattern proven in
-  // production snaps (prowlr, tees-omega). When the host follows the target
-  // URL, if the destination has fc:miniapp meta tags (which our /mint/[id]
-  // page does), it auto-launches as a miniapp with wallet context.
+  // Action: open_mini_app — params.url as structured { href } object.
+  // submit/target action POSTs to URL expecting snap-format response;
+  // doesn't fit "navigate to miniapp" use case. open_mini_app is the right
+  // action; trying nested URL shape per Cindy's hypothesis.
   const buttonElements = isEnded
     ? {
         cta: {
@@ -96,8 +96,8 @@ async function handleSnap({ id }: { id: string }) {
           props: { label: 'view drop', variant: 'secondary' },
           on: {
             press: {
-              action: 'submit',
-              params: { target: mintUrl },
+              action: 'open_mini_app',
+              params: { url: { href: mintUrl } },
             },
           },
         },
@@ -109,8 +109,8 @@ async function handleSnap({ id }: { id: string }) {
             props: { label: 'preview', variant: 'secondary' },
             on: {
               press: {
-                action: 'submit',
-                params: { target: mintUrl },
+                action: 'open_mini_app',
+                params: { url: { href: mintUrl } },
               },
             },
           },
@@ -121,8 +121,8 @@ async function handleSnap({ id }: { id: string }) {
             props: { label: `mint · ${totalCostEth} ETH`, variant: 'primary' },
             on: {
               press: {
-                action: 'submit',
-                params: { target: mintUrl },
+                action: 'open_mini_app',
+                params: { url: { href: mintUrl } },
               },
             },
           },
