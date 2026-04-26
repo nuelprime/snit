@@ -97,7 +97,7 @@ async function handleSnap({ id }: { id: string }) {
           on: {
             press: {
               action: 'open_mini_app',
-              params: { url: { href: mintUrl } },
+              params: { target: mintUrl },
             },
           },
         },
@@ -110,7 +110,7 @@ async function handleSnap({ id }: { id: string }) {
             on: {
               press: {
                 action: 'open_mini_app',
-                params: { url: { href: mintUrl } },
+                params: { target: mintUrl },
               },
             },
           },
@@ -122,7 +122,7 @@ async function handleSnap({ id }: { id: string }) {
             on: {
               press: {
                 action: 'open_mini_app',
-                params: { url: { href: mintUrl } },
+                params: { target: mintUrl },
               },
             },
           },
