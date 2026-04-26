@@ -27,7 +27,7 @@ const initialState: DropFormState = {
   description: '',
   file: null,
   filePreviewUrl: '',
-  mintPriceEth: '0.00037',
+  mintPriceEth: '',
   startMode: 'now',
   startTime: '',
   duration: '3d',
@@ -246,11 +246,8 @@ export default function CreateDropPage() {
             min="0"
             value={form.mintPriceEth}
             onChange={(v) => update('mintPriceEth', v)}
-            placeholder="0.00037"
+            placeholder="0/0.00037/↑"
           />
-          <p className="text-xs text-snit-muted mt-1">
-            0.00037 or higher. else 0.
-          </p>
         </Field>
 
         <Field label="When does it end?">
