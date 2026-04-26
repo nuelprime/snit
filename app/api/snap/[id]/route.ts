@@ -86,6 +86,9 @@ async function handleSnap({ id }: { id: string }) {
 
   // ── Build snap UI ──
   // States: upcoming / live / ended — different button variants/text
+  // Uses `submit` action with `params.target` — pattern confirmed working in
+  // production snaps (tees-omega.vercel.app). Target URL has fc:miniapp meta
+  // tags on the mint page, so the host auto-launches it as a miniapp.
   const buttonElements = isEnded
     ? {
         cta: {
@@ -93,8 +96,8 @@ async function handleSnap({ id }: { id: string }) {
           props: { label: 'view drop', variant: 'secondary' },
           on: {
             press: {
-              action: 'open_mini_app',
-              params: { miniAppUrl: mintUrl },
+              action: 'submit',
+              params: { target: mintUrl },
             },
           },
         },
@@ -106,8 +109,8 @@ async function handleSnap({ id }: { id: string }) {
             props: { label: 'preview', variant: 'secondary' },
             on: {
               press: {
-                action: 'open_mini_app',
-                params: { miniAppUrl: mintUrl },
+                action: 'submit',
+                params: { target: mintUrl },
               },
             },
           },
@@ -118,8 +121,8 @@ async function handleSnap({ id }: { id: string }) {
             props: { label: `mint · ${totalCostEth} ETH`, variant: 'primary' },
             on: {
               press: {
-                action: 'open_mini_app',
-                params: { miniAppUrl: mintUrl },
+                action: 'submit',
+                params: { target: mintUrl },
               },
             },
           },
@@ -131,27 +134,18 @@ async function handleSnap({ id }: { id: string }) {
     ui: {
       root: 'main',
       elements: {
-        // Root: vertical stack — top row (image + details) and full-width CTA below
+        // Vertical layout. Snap renderers stretch images to container width,
+        // so horizontal image+text doesn't render the way you'd expect.
+        // Instead we keep it vertical but use 16:9 aspect to keep the card
+        // compact (avoids the "show more" expander on tall cards).
         main: {
           type: 'stack',
           props: { direction: 'vertical', gap: 'sm' },
-          children: ['topRow', 'cta'],
-        },
-        // Horizontal: image on left, details column on right
-        topRow: {
-          type: 'stack',
-          props: { direction: 'horizontal', gap: 'md' },
-          children: ['image', 'details'],
+          children: ['image', 'title', 'info', 'cta'],
         },
         image: {
           type: 'image',
-          props: { url: drop.mediaUri, aspect: '1:1', alt: drop.title },
-        },
-        // Vertical column to the right of the image
-        details: {
-          type: 'stack',
-          props: { direction: 'vertical', gap: 'xs' },
-          children: ['title', 'info'],
+          props: { url: drop.mediaUri, aspect: '16:9', alt: drop.title },
         },
         title: {
           type: 'text',
