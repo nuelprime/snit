@@ -15,14 +15,14 @@ const FIXED_PRICE_MINTER_BASE = '0x04E2516A2c207E84a1839755675dfd8eF6302F0a' as 
 const ZORA_1155_MINT_ABI = [
   {
     type: 'function',
-    name: 'mintWithRewards',
+    name: 'mint',
     stateMutability: 'payable',
     inputs: [
       { name: 'minter', type: 'address' },
       { name: 'tokenId', type: 'uint256' },
       { name: 'quantity', type: 'uint256' },
+      { name: 'rewardsRecipients', type: 'address[]' },
       { name: 'minterArguments', type: 'bytes' },
-      { name: 'mintReferral', type: 'address' },
     ],
     outputs: [],
   },
@@ -152,13 +152,13 @@ export async function buildMintTx(params: MintParams) {
   return {
     address: params.contractAddress,
     abi: ZORA_1155_MINT_ABI,
-    functionName: 'mintWithRewards' as const,
+    functionName: 'mint' as const,
     args: [
       FIXED_PRICE_MINTER_BASE,
       params.tokenId,
       params.quantity,
+      [PLATFORM_ADDRESS] as readonly Address[],  // rewardsRecipients[0] = mintReferral
       minterArguments,
-      PLATFORM_ADDRESS, // 🎯 still earn referral rewards
     ] as const,
     value: totalValue,
   };
