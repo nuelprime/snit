@@ -85,9 +85,8 @@ async function handleSnap({ id }: { id: string }) {
       : `${timeLabel} left`;
 
   // ── Build snap UI ──
-  // States: upcoming / live / ended — different button variants/text
-  // Uses `open_url` action — host detects fc:miniapp meta tags on the target
-  // page and auto-launches it as a miniapp with wallet context.
+  // Action: open_mini_app — host launches the URL as a miniapp.
+  // Mint page has fc:miniapp meta tags so host gets wallet context.
   const buttonElements = isEnded
     ? {
         cta: {
@@ -95,7 +94,7 @@ async function handleSnap({ id }: { id: string }) {
           props: { label: 'view drop', variant: 'secondary' },
           on: {
             press: {
-              action: 'open_url',
+              action: 'open_mini_app',
               params: { url: mintUrl },
             },
           },
@@ -108,7 +107,7 @@ async function handleSnap({ id }: { id: string }) {
             props: { label: 'preview', variant: 'secondary' },
             on: {
               press: {
-                action: 'open_url',
+                action: 'open_mini_app',
                 params: { url: mintUrl },
               },
             },
@@ -120,7 +119,7 @@ async function handleSnap({ id }: { id: string }) {
             props: { label: `mint · ${totalCostEth} ETH`, variant: 'primary' },
             on: {
               press: {
-                action: 'open_url',
+                action: 'open_mini_app',
                 params: { url: mintUrl },
               },
             },
