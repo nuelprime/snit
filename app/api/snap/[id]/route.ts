@@ -94,7 +94,7 @@ async function handleSnap({ id }: { id: string }) {
           on: {
             press: {
               action: 'open_mini_app',
-              params: { url: mintUrl, name: 'snit' },
+              params: { miniAppUrl: mintUrl },
             },
           },
         },
@@ -107,7 +107,7 @@ async function handleSnap({ id }: { id: string }) {
             on: {
               press: {
                 action: 'open_mini_app',
-                params: { url: mintUrl, name: 'snit' },
+                params: { miniAppUrl: mintUrl },
               },
             },
           },
@@ -119,7 +119,7 @@ async function handleSnap({ id }: { id: string }) {
             on: {
               press: {
                 action: 'open_mini_app',
-                params: { url: mintUrl, name: 'snit' },
+                params: { miniAppUrl: mintUrl },
               },
             },
           },
@@ -138,7 +138,7 @@ async function handleSnap({ id }: { id: string }) {
         },
         image: {
           type: 'image',
-          props: { src: drop.mediaUri, alt: drop.title },
+          props: { src: drop.mediaUri, alt: drop.title, aspectRatio: '1:1' },
         },
         title: {
           type: 'text',
