@@ -41,7 +41,7 @@ async function handleSnap({ id }: { id: string }) {
         elements: {
           main: {
             type: 'stack',
-            props: { gap: 'md' },
+            props: { direction: 'vertical', gap: 'sm' },
             children: ['title', 'msg'],
           },
           title: {
@@ -131,14 +131,27 @@ async function handleSnap({ id }: { id: string }) {
     ui: {
       root: 'main',
       elements: {
+        // Root: vertical stack — top row (image + details) and full-width CTA below
         main: {
           type: 'stack',
-          props: { gap: 'md' },
-          children: ['image', 'title', 'info', 'cta'],
+          props: { direction: 'vertical', gap: 'sm' },
+          children: ['topRow', 'cta'],
+        },
+        // Horizontal: image on left, details column on right
+        topRow: {
+          type: 'stack',
+          props: { direction: 'horizontal', gap: 'md' },
+          children: ['image', 'details'],
         },
         image: {
           type: 'image',
-          props: { src: drop.mediaUri, alt: drop.title, aspectRatio: '1:1' },
+          props: { url: drop.mediaUri, aspect: '1:1', alt: drop.title },
+        },
+        // Vertical column to the right of the image
+        details: {
+          type: 'stack',
+          props: { direction: 'vertical', gap: 'xs' },
+          children: ['title', 'info'],
         },
         title: {
           type: 'text',
