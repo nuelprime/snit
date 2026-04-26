@@ -80,7 +80,6 @@ export async function deployDrop(params: DeployParams): Promise<DeployResult> {
       payoutRecipient: params.splitsAddress,
       createReferral: PLATFORM_ADDRESS,
       maxSupply: effectiveMaxSupply,
-      mintToCreatorCount: 1, // mint #1 to artist for proof-of-creation
       salesConfig: {
         type: 'fixedPrice',
         pricePerToken: params.pricePerTokenWei,
