@@ -40,16 +40,17 @@ async function handleSnap({ id }: { id: string }) {
         root: 'main',
         elements: {
           main: {
-            type: 'container',
+            type: 'stack',
+            props: { gap: 'md' },
             children: ['title', 'msg'],
           },
           title: {
             type: 'text',
-            props: { text: 'snit', weight: 'bold' },
+            props: { content: 'snit', weight: 'bold' },
           },
           msg: {
             type: 'text',
-            props: { text: 'drop not found', size: 'sm' },
+            props: { content: 'drop not found', size: 'sm' },
           },
         },
       },
@@ -89,7 +90,7 @@ async function handleSnap({ id }: { id: string }) {
     ? {
         cta: {
           type: 'button',
-          props: { title: 'view drop', variant: 'secondary' },
+          props: { label: 'view drop', variant: 'secondary' },
           on: {
             press: {
               action: 'open_mini_app',
@@ -102,7 +103,7 @@ async function handleSnap({ id }: { id: string }) {
       ? {
           cta: {
             type: 'button',
-            props: { title: 'preview', variant: 'secondary' },
+            props: { label: 'preview', variant: 'secondary' },
             on: {
               press: {
                 action: 'open_mini_app',
@@ -114,7 +115,7 @@ async function handleSnap({ id }: { id: string }) {
       : {
           cta: {
             type: 'button',
-            props: { title: `mint · ${totalCostEth} ETH`, variant: 'primary' },
+            props: { label: `mint · ${totalCostEth} ETH`, variant: 'primary' },
             on: {
               press: {
                 action: 'open_mini_app',
@@ -131,8 +132,9 @@ async function handleSnap({ id }: { id: string }) {
       root: 'main',
       elements: {
         main: {
-          type: 'container',
-          children: ['image', 'title', 'meta', 'cta'],
+          type: 'stack',
+          props: { gap: 'md' },
+          children: ['image', 'title', 'info', 'cta'],
         },
         image: {
           type: 'image',
@@ -140,12 +142,12 @@ async function handleSnap({ id }: { id: string }) {
         },
         title: {
           type: 'text',
-          props: { text: drop.title, weight: 'bold', size: 'md' },
+          props: { content: drop.title, weight: 'bold', size: 'md' },
         },
-        meta: {
+        info: {
           type: 'text',
           props: {
-            text: `${drop.creatorUsername ? '@' + drop.creatorUsername + ' · ' : ''}${stateLabel} · ${drop.mintCount} minted`,
+            content: `${drop.creatorUsername ? '@' + drop.creatorUsername + ' · ' : ''}${stateLabel} · ${drop.mintCount} minted`,
             size: 'sm',
           },
         },
