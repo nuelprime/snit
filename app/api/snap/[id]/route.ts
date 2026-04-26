@@ -86,9 +86,8 @@ async function handleSnap({ id }: { id: string }) {
 
   // ── Build snap UI ──
   // States: upcoming / live / ended — different button variants/text
-  // Uses `submit` action with `params.target` — pattern confirmed working in
-  // production snaps (tees-omega.vercel.app). Target URL has fc:miniapp meta
-  // tags on the mint page, so the host auto-launches it as a miniapp.
+  // Uses `open_url` action — host detects fc:miniapp meta tags on the target
+  // page and auto-launches it as a miniapp with wallet context.
   const buttonElements = isEnded
     ? {
         cta: {
@@ -96,8 +95,8 @@ async function handleSnap({ id }: { id: string }) {
           props: { label: 'view drop', variant: 'secondary' },
           on: {
             press: {
-              action: 'submit',
-              params: { target: mintUrl },
+              action: 'open_url',
+              params: { url: mintUrl },
             },
           },
         },
@@ -109,8 +108,8 @@ async function handleSnap({ id }: { id: string }) {
             props: { label: 'preview', variant: 'secondary' },
             on: {
               press: {
-                action: 'submit',
-                params: { target: mintUrl },
+                action: 'open_url',
+                params: { url: mintUrl },
               },
             },
           },
@@ -121,8 +120,8 @@ async function handleSnap({ id }: { id: string }) {
             props: { label: `mint · ${totalCostEth} ETH`, variant: 'primary' },
             on: {
               press: {
-                action: 'submit',
-                params: { target: mintUrl },
+                action: 'open_url',
+                params: { url: mintUrl },
               },
             },
           },
@@ -171,7 +170,9 @@ function snapResponse(body: object) {
       'Content-Type': 'application/vnd.farcaster.snap+json',
       'Access-Control-Allow-Origin': '*',
       'Vary': 'Accept',
-      'Cache-Control': 'public, max-age=30, s-maxage=30',
+      // No cache during dev iteration. Restore to `public, max-age=30, s-maxage=30`
+      // before launch for CDN performance.
+      'Cache-Control': 'no-store, no-cache, must-revalidate',
     },
   });
 }
