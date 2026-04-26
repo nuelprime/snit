@@ -171,9 +171,7 @@ function snapResponse(body: object) {
       'Content-Type': 'application/vnd.farcaster.snap+json',
       'Access-Control-Allow-Origin': '*',
       'Vary': 'Accept',
-      // No cache during dev iteration. Restore to `public, max-age=30, s-maxage=30`
-      // before launch for CDN performance.
-      'Cache-Control': 'no-store, no-cache, must-revalidate',
+      'Cache-Control': 'public, max-age=30, s-maxage=30',
     },
   });
 }
