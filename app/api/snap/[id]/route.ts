@@ -85,8 +85,11 @@ async function handleSnap({ id }: { id: string }) {
       : `${timeLabel} left`;
 
   // ── Build snap UI ──
-  // Action: open_mini_app — host launches the URL as a miniapp.
-  // Mint page has fc:miniapp meta tags so host gets wallet context.
+  // Action: open_mini_app — params.miniAppUrl per Snap v2 spec.
+  // Each action has its own strict param shape:
+  //   submit → params.target
+  //   open_url → params.url
+  //   open_mini_app → params.miniAppUrl
   const buttonElements = isEnded
     ? {
         cta: {
@@ -95,7 +98,7 @@ async function handleSnap({ id }: { id: string }) {
           on: {
             press: {
               action: 'open_mini_app',
-              params: { url: mintUrl },
+              params: { miniAppUrl: mintUrl },
             },
           },
         },
@@ -108,7 +111,7 @@ async function handleSnap({ id }: { id: string }) {
             on: {
               press: {
                 action: 'open_mini_app',
-                params: { url: mintUrl },
+                params: { miniAppUrl: mintUrl },
               },
             },
           },
@@ -120,7 +123,7 @@ async function handleSnap({ id }: { id: string }) {
             on: {
               press: {
                 action: 'open_mini_app',
-                params: { url: mintUrl },
+                params: { miniAppUrl: mintUrl },
               },
             },
           },
