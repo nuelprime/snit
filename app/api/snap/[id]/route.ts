@@ -89,7 +89,7 @@ async function handleSnap({ id }: { id: string }) {
     ? {
         cta: {
           type: 'button',
-          props: { label: 'view drop', variant: 'secondary' },
+          props: { title: 'view drop', variant: 'secondary' },
           on: {
             press: {
               action: 'open_mini_app',
@@ -102,7 +102,7 @@ async function handleSnap({ id }: { id: string }) {
       ? {
           cta: {
             type: 'button',
-            props: { label: 'preview', variant: 'secondary' },
+            props: { title: 'preview', variant: 'secondary' },
             on: {
               press: {
                 action: 'open_mini_app',
@@ -114,7 +114,7 @@ async function handleSnap({ id }: { id: string }) {
       : {
           cta: {
             type: 'button',
-            props: { label: `mint · ${totalCostEth} ETH`, variant: 'primary' },
+            props: { title: `mint · ${totalCostEth} ETH`, variant: 'primary' },
             on: {
               press: {
                 action: 'open_mini_app',

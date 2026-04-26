@@ -357,9 +357,9 @@ export default function CreateDropPage() {
           className="w-full py-3 font-semibold rounded-lg transition bg-snit-accent text-white hover:opacity-90 disabled:bg-snit-surface disabled:text-snit-muted disabled:cursor-not-allowed disabled:hover:opacity-100"
         >
           {step === 'idle' && 'deploy drop'}
-          {step === 'uploading' && 'uploading art...'}
-          {step === 'splits' && 'deploying splits contract...'}
-          {step === 'deploying' && 'deploying drop on-chain...'}
+          {step === 'uploading' && 'uploading…'}
+          {step === 'splits' && 'deploying…'}
+          {step === 'deploying' && 'deploying…'}
           {step === 'done' && 'done!'}
         </button>
       </form>

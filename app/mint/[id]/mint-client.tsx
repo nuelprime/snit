@@ -51,6 +51,7 @@ export default function MintClient({ drop }: Props) {
   const totalCostWei =
     BigInt(drop.mintPrice) + BigInt(PROTOCOL_FEE_WEI);
   const totalCostEth = formatEther(totalCostWei);
+  const isFree = BigInt(drop.mintPrice) === 0n;
 
   async function onMint() {
     setError(null);
@@ -114,20 +115,27 @@ export default function MintClient({ drop }: Props) {
 
       {/* Stats */}
       <div className="mt-6 grid grid-cols-2 gap-3">
-        <Stat label="price" value={`${totalCostEth} ETH`} />
+        <Stat label="price" value={isFree ? 'free' : `${formatEther(BigInt(drop.mintPrice))} ETH`} />
         <Stat label="minted" value={String(drop.mintCount)} />
-        <Stat
-          label={isUpcoming ? 'starts in' : 'ends in'}
-          value={
-            <Countdown
-              targetUnix={isUpcoming ? drop.startTime : drop.endTime}
-            />
-          }
-        />
+        {drop.endCondition !== 'supply_only' && (
+          <Stat
+            label={isUpcoming ? 'starts in' : 'ends in'}
+            value={
+              <Countdown
+                targetUnix={isUpcoming ? drop.startTime : drop.endTime}
+              />
+            }
+          />
+        )}
         {drop.maxSupply !== '0' && (
           <Stat label="supply cap" value={drop.maxSupply} />
         )}
       </div>
+      <p className="text-xs text-snit-muted mt-3">
+        {isFree
+          ? `free mint + ${formatEther(BigInt(PROTOCOL_FEE_WEI))} ETH zora fee`
+          : `total: ${totalCostEth} ETH (mint price + zora fee)`}
+      </p>
 
       {/* CTA */}
       <div className="mt-8">
@@ -150,9 +158,9 @@ export default function MintClient({ drop }: Props) {
           <button
             onClick={onMint}
             disabled={minting || !isConnected}
-            className="w-full py-4 bg-snit-accent text-black font-bold rounded-lg disabled:opacity-50 hover:opacity-90 transition"
+            className="w-full py-4 font-bold rounded-lg transition bg-snit-accent text-white hover:opacity-90 disabled:bg-snit-surface disabled:text-snit-muted disabled:cursor-not-allowed disabled:hover:opacity-100"
           >
-            {minting ? 'minting…' : `mint for ${totalCostEth} ETH`}
+            {minting ? 'minting…' : isFree ? `mint (${totalCostEth} ETH fee)` : `mint for ${totalCostEth} ETH`}
           </button>
         )}
         {error && (

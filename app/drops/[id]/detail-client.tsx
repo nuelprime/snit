@@ -10,7 +10,7 @@ export default function DropDetailClient({ drop }: { drop: PublicDrop }) {
   const [copied, setCopied] = useState(false);
 
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
-  const mintPageUrl = `${baseUrl}/mint/${drop.id}`;
+  const snapUrl = `${baseUrl}/api/snap/${drop.id}`;
 
   const totalCostWei = BigInt(drop.mintPrice) + BigInt(PROTOCOL_FEE_WEI);
   const totalCostEth = formatEther(totalCostWei);
@@ -24,13 +24,9 @@ export default function DropDetailClient({ drop }: { drop: PublicDrop }) {
   async function castDrop() {
     try {
       const { sdk } = await import('@farcaster/miniapp-sdk');
-      // Cast the mint page URL — it has the fc:miniapp meta tag in <head>,
-      // which is what Warpcast and other clients look for to render an in-feed embed.
-      // Casting the snap JSON URL (api/snap/...) does NOT render an embed in clients
-      // that don't yet implement the snap protocol.
       await sdk.actions.composeCast({
         text: `${drop.title} — minting now on snit ↓`,
-        embeds: [mintPageUrl],
+        embeds: [snapUrl],
       });
     } catch (err) {
       console.error(err);
@@ -90,7 +86,7 @@ export default function DropDetailClient({ drop }: { drop: PublicDrop }) {
         </button>
 
         <button
-          onClick={() => copy(mintPageUrl)}
+          onClick={() => copy(snapUrl)}
           className="w-full py-3 border border-snit-border rounded-lg hover:bg-snit-surface transition text-sm"
         >
           {copied ? 'copied!' : 'copy share link'}
