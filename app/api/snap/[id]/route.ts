@@ -161,6 +161,7 @@ function snapResponse(body: object) {
     headers: {
       'Content-Type': 'application/vnd.farcaster.snap+json',
       'Access-Control-Allow-Origin': '*',
+      'Vary': 'Accept',
       'Cache-Control': 'public, max-age=30, s-maxage=30',
     },
   });
