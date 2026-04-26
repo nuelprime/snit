@@ -4,7 +4,7 @@
     "payload": "eyJkb21haW4iOiJzbml0LmxvbCJ9",
     "signature": "JHIWJVbH4/WWHK/bGuckHvSxB3/WkORZa2P02GoMC6w0DBw1DXCOqxoSyelRBhZnrHeVG8lFM+U/ewBBcygJ/xw="
   },
-  "frame": {
+  "miniapp": {
     "version": "1",
     "name": "snit",
     "iconUrl": "https://snit.lol/icon.png",
