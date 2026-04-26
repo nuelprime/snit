@@ -1,9 +1,32 @@
-import { create1155, mint } from '@zoralabs/protocol-sdk';
+import { create1155 } from '@zoralabs/protocol-sdk';
+import { encodeAbiParameters } from 'viem';
 import type { Address, PublicClient, WalletClient } from 'viem';
 import { base } from 'viem/chains';
 import { PROTOCOL_FEE_WEI } from './types';
 
 const PLATFORM_ADDRESS = process.env.NEXT_PUBLIC_PLATFORM_ADDRESS as Address;
+
+// Zora's FixedPriceSaleStrategy minter contract on Base mainnet.
+// Source: @zoralabs/protocol-deployments wagmi.d.ts → zoraCreatorFixedPriceSaleStrategyAddress[8453]
+const FIXED_PRICE_MINTER_BASE = '0x04E2516A2c207E84a1839755675dfd8eF6302F0a' as const;
+
+// ZoraCreator1155Impl mintWithRewards function ABI.
+// We call this directly to bypass the SDK's broken Goldsky subgraph dependency.
+const ZORA_1155_MINT_ABI = [
+  {
+    type: 'function',
+    name: 'mintWithRewards',
+    stateMutability: 'payable',
+    inputs: [
+      { name: 'minter', type: 'address' },
+      { name: 'tokenId', type: 'uint256' },
+      { name: 'quantity', type: 'uint256' },
+      { name: 'minterArguments', type: 'bytes' },
+      { name: 'mintReferral', type: 'address' },
+    ],
+    outputs: [],
+  },
+] as const;
 
 // ─────────────────────────────────────────────
 // Zora Protocol SDK — current API
@@ -101,20 +124,44 @@ export interface MintParams {
   tokenId: bigint;
   quantity: bigint;
   minterAddress: Address;
+  pricePerTokenWei: bigint;
   publicClient: PublicClient;
 }
 
+/**
+ * Build a mint transaction by directly calling Zora's ZoraCreator1155Impl.mintWithRewards.
+ *
+ * Bypasses @zoralabs/protocol-sdk's mint() function which queries a deleted
+ * Goldsky subgraph (api.goldsky.com/.../zora-create-base-mainnet/stable/gn).
+ * That endpoint returns 404 as of 2026-Q2 because the SDK is unmaintained for
+ * the 1155 creator path. We call the contract directly using viem instead —
+ * no metadata fetch needed since we already have contractAddress + tokenId in
+ * our DB from the deploy step.
+ *
+ * Same protocol behavior: same rewards, same splits, same referral payout.
+ */
 export async function buildMintTx(params: MintParams) {
-  const { parameters } = await mint({
-    tokenContract: params.contractAddress,
-    mintType: '1155',
-    tokenId: params.tokenId,
-    quantityToMint: Number(params.quantity),
-    mintReferral: PLATFORM_ADDRESS, // 🎯 we earn referral rewards on every mint
-    minterAccount: params.minterAddress,
-    publicClient: params.publicClient as any,
-  });
-  return parameters;
+  // For FixedPriceSaleStrategy, minterArguments is just the abi-encoded recipient.
+  const minterArguments = encodeAbiParameters(
+    [{ name: 'recipient', type: 'address' }],
+    [params.minterAddress],
+  );
+
+  const totalValue = totalMintCost(params.pricePerTokenWei, params.quantity);
+
+  return {
+    address: params.contractAddress,
+    abi: ZORA_1155_MINT_ABI,
+    functionName: 'mintWithRewards' as const,
+    args: [
+      FIXED_PRICE_MINTER_BASE,
+      params.tokenId,
+      params.quantity,
+      minterArguments,
+      PLATFORM_ADDRESS, // 🎯 still earn referral rewards
+    ] as const,
+    value: totalValue,
+  };
 }
 
 // Total cost (price + protocol fee) in wei

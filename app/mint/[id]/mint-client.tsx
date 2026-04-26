@@ -73,6 +73,7 @@ export default function MintClient({ drop }: Props) {
         quantity: 1n,
         minterAddress: address,
         publicClient,
+        pricePerTokenWei: BigInt(drop.mintPrice),
       });
 
       const hash = await walletClient.writeContract({
@@ -133,8 +134,8 @@ export default function MintClient({ drop }: Props) {
       </div>
       <p className="text-xs text-snit-muted mt-3">
         {isFree
-          ? `free mint + ${formatEther(BigInt(PROTOCOL_FEE_WEI))} ETH zora fee`
-          : `total: ${totalCostEth} ETH (mint price + zora fee)`}
+          ? `free mint + ${formatEther(BigInt(PROTOCOL_FEE_WEI))} ETH fee`
+          : `total: ${totalCostEth} ETH (mint price + fee)`}
       </p>
 
       {/* CTA */}
@@ -160,7 +161,7 @@ export default function MintClient({ drop }: Props) {
             disabled={minting || !isConnected}
             className="w-full py-4 font-bold rounded-lg transition bg-snit-accent text-white hover:opacity-90 disabled:bg-snit-surface disabled:text-snit-muted disabled:cursor-not-allowed disabled:hover:opacity-100"
           >
-            {minting ? 'minting…' : isFree ? `mint (${totalCostEth} ETH fee)` : `mint for ${totalCostEth} ETH`}
+            {minting ? 'minting…' : 'mint'}
           </button>
         )}
         {error && (
